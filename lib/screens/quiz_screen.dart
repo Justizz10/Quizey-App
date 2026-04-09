@@ -22,7 +22,6 @@ class _QuizScreenState extends State<QuizScreen> {
   // Memudahkan mengambil soal saat ini
   Question get _soalSaatIni => daftarSoal[_indexSoal];
 
-  // --- FITUR WAJIB SESUAI SPESIFIKASI ---
 
   // Mengecek apakah sudah mencapai soal terakhir
   bool isFinished() {
@@ -61,15 +60,24 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-  // Logika saat user memilih jawaban
   void _pilihJawaban(int index) {
     if (_sudahJawab) return;
-    _timer?.cancel(); // Menghentikan waktu segera setelah tombol diklik
+
+    _timer?.cancel(); // Hentikan timer
+
     setState(() {
       _indexDipilih = index;
       _sudahJawab = true;
-      if (_soalSaatIni.isBenar(index)) {
+
+      // Jika jawaban benar, tambah skor
+      if (index != -1 && _soalSaatIni.isBenar(index)) {
         _skor++;
+      }
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        _lanjutSoal();
       }
     });
   }
@@ -83,7 +91,7 @@ class _QuizScreenState extends State<QuizScreen> {
         _sudahJawab = false;
       });
       _mulaiTimer(); // Menyalakan ulang timer untuk soal baru
-      
+
     } else {
       // Implementasi Kondisi Akhir Kuis (Alert Dialog Wajib)
       showDialog(
@@ -142,6 +150,7 @@ class _QuizScreenState extends State<QuizScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+
             // Indikator Progress
             LinearProgressIndicator(value: progress),
             const SizedBox(height: 8),
@@ -151,15 +160,32 @@ class _QuizScreenState extends State<QuizScreen> {
               textAlign: TextAlign.end,
             ),
             const SizedBox(height: 28),
-
-            // Hitungan Waktu
-            Text(
-              'Sisa Waktu: $_waktuTersisa detik',
-              style: TextStyle(
-                color: _waktuTersisa <= 5 ? Colors.red : Colors.black,
-                fontWeight: FontWeight.bold,
+            // Tampilkan sisa waktu
+            Center(
+              child: Text(
+                _waktuTersisa > 0 ? 'Sisa Waktu: $_waktuTersisa' :            '',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: _waktuTersisa == 0 ? Colors.red : (_waktuTersisa <= 5 ? Colors.orange : Colors.blue),
+                ),
               ),
             ),
+            const SizedBox(height: 10),
+
+            // Hitungan Waktu
+            if (_waktuTersisa == 0)
+              Center(
+                child: Text(
+                  "⌛ WAKTU HABIS!",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 20),
 
             // Teks Pertanyaan
             Text(
@@ -176,18 +202,6 @@ class _QuizScreenState extends State<QuizScreen> {
             }),
 
             const Spacer(),
-
-            // Tombol Navigasi (Hanya muncul jika sudah dijawab)
-            if (_sudahJawab)
-              FilledButton(
-                onPressed: _lanjutSoal,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(
-                  isFinished() ? 'Selesaikan Kuis' : 'Soal Berikutnya',
-                ),
-              ),
           ],
         ),
       ),
