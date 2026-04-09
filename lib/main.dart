@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'screens/quiz_screen.dart';
+import 'screens/home_screen.dart'; // Import home screen baru
 
 void main() {
-  runApp(const QuizeyApp());
+  runApp(const MyApp());
 }
 
-class QuizeyApp extends StatelessWidget {
-  const QuizeyApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +14,10 @@ class QuizeyApp extends StatelessWidget {
       title: 'Quizey',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,
-        ),
         useMaterial3: true,
+        colorSchemeSeed: Colors.blue, // Tema warna dasar biru
       ),
-      home: const QuizScreen(),
+      home: const HomeScreen(), // Ubah ini dari QuizScreen ke HomeScreen
     );
   }
 }
